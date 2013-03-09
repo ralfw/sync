@@ -1,0 +1,11 @@
+/bin/
+^bin/
+/obj/
+^obj/
+/unversioned/
+^unversioned/
+
+/_resharper
+.user$
+.suo$
+.synclocal$

@@ -1,0 +1,3 @@
+konflikt erkennen: lokal neue datei, aber auch im remote repo diese datei vorhanden
+
+löschkonflikte erkennen
