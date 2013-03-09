@@ -231,7 +231,7 @@ namespace sync.localsynctable.tests
 
             var result = sut.GetTimeStamp(new RepoFile { RelativeFileName = "myfn", Id = "new id", User = "new user", TimeStamp = new DateTime(2000,5,12)});
 
-            Equalidator.AreEqual(result, new RepoFile { RelativeFileName = "myfn", Id = "new id", User = "new user", TimeStamp = new DateTime(2000, 5, 12) });
+            Assert.IsNull(result);
         }
     }
 }

@@ -69,7 +69,7 @@ namespace sync.localsynctable
         public RepoFile GetTimeStamp(RepoFile repoFile)
         {
             var entry = _syncTable.Find(e => e.RelativeFilename == repoFile.RelativeFileName);
-            if (entry == null) return repoFile;
+            if (entry == null) return null;
 
             repoFile.TimeStamp = entry.TimeStamp;
             return new RepoFile {Id=repoFile.Id, User=repoFile.User,RelativeFileName = repoFile.RelativeFileName, RepoRoot = repoFile.RepoRoot, TimeStamp = entry.TimeStamp};

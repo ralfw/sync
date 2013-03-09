@@ -149,7 +149,7 @@ namespace sync.localfilesystem.tests
             Assert.That(File.Exists("non-existing"), Is.False);
             
             var result = sut.GetTimeStamp(new RepoFile { RepoRoot = ".", RelativeFileName = "new-file", TimeStamp = new DateTime(2013, 1, 3) });
-            Assert.That(result.TimeStamp, Is.EqualTo(new DateTime(2013, 1, 3)));
+            Assert.IsNull(result);
          }
     }
 }

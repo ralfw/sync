@@ -89,7 +89,7 @@ namespace sync.localfilesystem
 
         public RepoFile GetTimeStamp(RepoFile repoFile) {
             var filename = GetAbsoluteFilename(repoFile);
-            if (!File.Exists(filename)) return repoFile;
+            if (!File.Exists(filename)) return null;
 
             var timeStamp = File.GetLastWriteTime(filename);
             return new RepoFile{Id=repoFile.Id, RelativeFileName = repoFile.RelativeFileName, RepoRoot = repoFile.RepoRoot, User = repoFile.User, TimeStamp = timeStamp};
