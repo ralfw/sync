@@ -1,3 +1,11 @@
 konflikt erkennen: lokal neue datei, aber auch im remote repo diese datei vorhanden
 
 löschkonflikte erkennen
+
+konflikte loggen (in rot)
+
+remote repo in der cloud (parse.com)
+
+concurrent access
+
+async/parallel up/download in der cloud
