@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using sync.contracts;
 using sync.remotefilestore.parse.api;
 
@@ -23,10 +24,12 @@ namespace sync.remotefilestore.parse
 
         public RepoFile Upload(RepoFile repoFile, Stream stream)
         {
-            var uploadInfo = _parseFiles.Upload(stream, repoFile.RelativeFileName);
+            var uniqueFilename = "fn_" + Guid.NewGuid().ToString();
+            var uploadInfo = _parseFiles.Upload(stream, uniqueFilename);
             stream.Dispose();
 
             var pfi = new ParseFileInfo {Url = uploadInfo.Url, Name = uploadInfo.Name};
+
             return new RepoFile {
                                     Id = pfi.ToString(),
                                     RelativeFileName = repoFile.RelativeFileName,
@@ -50,6 +53,19 @@ namespace sync.remotefilestore.parse
             var pfi = ParseFileInfo.Parse(repoFile.Id);
             _parseFiles.Delete(pfi.Name);
             return repoFile;
+        }
+
+
+        internal string EscapeFilename(string filepath)
+        {
+            return HttpUtility.UrlEncode(filepath).Replace(".", "_dot_");
+            //var path = Path.GetDirectoryName(filepath);
+            //var filename = Path.GetFileName(filepath);
+
+            //if (filename.StartsWith("."))
+            //    filename = "sync___sync" + filename;
+
+            //return path + (path == "" ? "" : "/") + filename;
         }
     }
 }

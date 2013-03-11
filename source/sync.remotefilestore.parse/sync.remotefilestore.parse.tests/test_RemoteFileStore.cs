@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using NUnit.Framework;
 using equalidator;
 using sync.contracts;
@@ -16,22 +17,22 @@ namespace sync.remotefilestore.parse.tests
     [TestFixture]
     public class test_RemoteFileStore
     {
-        private string _appId;
-        private string _restKey;
-        private string _masterKey;
-
         private ParseFiles _pf;
+        private RemoteFileStore _sut;
+
 
         [SetUp]
         public void Setup()
         {
             using (var sr = new StreamReader(@"..\..\..\..\..\unversioned\.syncconfig"))
             {
-                _appId = sr.ReadLine();
-                _restKey = sr.ReadLine();
-                _masterKey = sr.ReadLine();
+                var appId = sr.ReadLine();
+                var restKey = sr.ReadLine();
+                var masterKey = sr.ReadLine();
+
+                _pf = new ParseFiles(appId, restKey, masterKey);
+                _sut = new RemoteFileStore(appId, restKey, masterKey);
             }
-            _pf = new ParseFiles(_appId, _restKey, _masterKey);
         }
 
 
@@ -57,10 +58,8 @@ namespace sync.remotefilestore.parse.tests
         [Test, Explicit]
         public void Upload_file()
         {
-            var sut = new RemoteFileStore(_appId, _restKey, _masterKey);
-
             var data = new MemoryStream(Encoding.ASCII.GetBytes("hello"));
-            var result = sut.Upload(new RepoFile{RelativeFileName = "myfn"}, data);
+            var result = _sut.Upload(new RepoFile{RelativeFileName = "myfn"}, data);
 
             Assert.AreEqual("myfn", result.RelativeFileName);
             Assert.IsTrue(result.Id.IndexOf("#") > 0);
@@ -78,11 +77,10 @@ namespace sync.remotefilestore.parse.tests
         [Test, Explicit]
         public void Delete_file()
         {
-            var sut = new RemoteFileStore(_appId, _restKey, _masterKey);
             var data = new MemoryStream(Encoding.ASCII.GetBytes("hello"));
-            var rf = sut.Upload(new RepoFile { RelativeFileName = "myfn" }, data);
+            var rf = _sut.Upload(new RepoFile { RelativeFileName = "myfn" }, data);
 
-            var result = sut.Delete(rf);
+            var result = _sut.Delete(rf);
             Assert.AreEqual(result, rf);
 
             Assert.Throws<WebException>(() =>
@@ -96,12 +94,11 @@ namespace sync.remotefilestore.parse.tests
         [Test, Explicit]
         public void Download_file()
         {
-            var sut = new RemoteFileStore(_appId, _restKey, _masterKey);
             var data = new MemoryStream(Encoding.ASCII.GetBytes("hello"));
-            var rf = sut.Upload(new RepoFile { RelativeFileName = "myfn" }, data);
+            var rf = _sut.Upload(new RepoFile { RelativeFileName = "myfn" }, data);
             try
             {
-                var result = sut.Download(rf);
+                var result = _sut.Download(rf);
                 Equalidator.AreEqual(result.Item1, rf);
                 using (var sr = new StreamReader(result.Item2))
                 {
@@ -110,8 +107,24 @@ namespace sync.remotefilestore.parse.tests
             }
             finally
             {
-                sut.Delete(rf);
+                _sut.Delete(rf);
             }
+        }
+
+
+        [Test, Explicit]
+        public void Filename_is_replaced_by_some_unique_id_for_uploading_to_avoid_rejection_due_to_special_chars()
+        {
+            var data = new MemoryStream(Encoding.ASCII.GetBytes("hello"));
+            var result = _sut.Upload(new RepoFile { RelativeFileName = "myfilename" }, data);
+
+            Console.WriteLine("repo file id: {0}", result.Id);
+
+            var pfi = ParseFileInfo.Parse(result.Id);
+            Console.WriteLine("Url: {0}", pfi.Url);
+            Console.WriteLine("Name: {0}", pfi.Name);
+
+            _pf.Delete(pfi.Name);
         }
     }
 }
