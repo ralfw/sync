@@ -47,7 +47,7 @@ namespace sync.pull
                 return new remotesynctable.filesystem.RemoteSyncTable(_remoteRepoPath);
 
             Console.WriteLine("Storing sync table in the cloud...");
-            return new remotesynctable.filesystem.RemoteSyncTable(@"c:\" + _remoteRepoPath);
+            return new remotesynctable.parse.RemoteSyncTable(_remoteRepoPath, _appId, _restKey);
         }
     }
 }

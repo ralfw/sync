@@ -60,6 +60,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\bin\sync.remotesynctable.filesystem.dll</HintPath>
     </Reference>
+    <Reference Include="sync.remotesynctable.parse, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\sync.remotesynctable.parse.dll</HintPath>
+    </Reference>
     <Reference Include="sync.ui, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\bin\sync.ui.dll</HintPath>
