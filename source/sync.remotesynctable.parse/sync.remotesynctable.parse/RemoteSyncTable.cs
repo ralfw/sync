@@ -27,7 +27,6 @@ namespace sync.remotesynctable.parse
         public void AddEntry(RepoFile repoFile)
         {
             var jsonRepoFile = repoFile.ToJson();
-            Console.WriteLine(jsonRepoFile);
             _parseObjects.New(_repoName, jsonRepoFile);
         }
 
@@ -39,7 +38,7 @@ namespace sync.remotesynctable.parse
             {
                 _parseObjects[_repoName, item["objectId"].ToString()] = repoFile.ToJson();
 
-                onEntryUpdated(repoFile);
+                onEntryUpdated(item.ToRepoFile());
             }
             else
                 onNoEntry(repoFile);
@@ -80,9 +79,9 @@ namespace sync.remotesynctable.parse
         }
 
 
-        bool TryFindEntry(RepoFile repoFile, out Dictionary<string, object> dictRepoFile)
+        internal bool TryFindEntry(RepoFile repoFile, out Dictionary<string, object> dictRepoFile)
         {
-            var jsonQueryResults = _parseObjects.Query(_repoName, "{\"relativeFilename\":\"" + repoFile.RelativeFileName + "\"}");
+            var jsonQueryResults = _parseObjects.Query(_repoName, "{\"relativeFilename\":\"" + RepoFileSerializer.Encode_RelativeFilename(repoFile.RelativeFileName) + "\"}");
 
             var queryResults = (Dictionary<string,object>)_jss.DeserializeObject(jsonQueryResults);
             var queryResultItems = (object[])queryResults["results"];
@@ -93,32 +92,6 @@ namespace sync.remotesynctable.parse
                 dictRepoFile = null;
 
             return dictRepoFile != null;
-        }
-    }
-
-
-    static class RepoFileSerializer
-    {
-        public static string ToJson(this RepoFile repoFile)
-        {
-            return "{" + 
-                        string.Format("\"relativeFilename\": \"{0}\",\n", repoFile.RelativeFileName) +
-                        string.Format("\"idInFilestore\": \"{0}\",\n", repoFile.Id) +
-                        string.Format("\"timeStamp\": \"{0}\",\n", repoFile.TimeStamp.ToString("s")) +
-                        string.Format("\"user\": \"{0}\"", repoFile.User) +
-                   "}";
-
-        }
-
-        public static RepoFile ToRepoFile(this Dictionary<string, object> dictRepoFile)
-        {
-            return new RepoFile
-                {
-                    Id = dictRepoFile["idInFilestore"].ToString(),
-                    RelativeFileName = dictRepoFile["relativeFilename"].ToString(),
-                    TimeStamp = DateTime.Parse(dictRepoFile["timeStamp"].ToString()),
-                    User = dictRepoFile["user"].ToString()
-                };
         }
     }
 }

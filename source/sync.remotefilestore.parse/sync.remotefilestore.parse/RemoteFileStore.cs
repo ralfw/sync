@@ -54,18 +54,5 @@ namespace sync.remotefilestore.parse
             _parseFiles.Delete(pfi.Name);
             return repoFile;
         }
-
-
-        internal string EscapeFilename(string filepath)
-        {
-            return HttpUtility.UrlEncode(filepath).Replace(".", "_dot_");
-            //var path = Path.GetDirectoryName(filepath);
-            //var filename = Path.GetFileName(filepath);
-
-            //if (filename.StartsWith("."))
-            //    filename = "sync___sync" + filename;
-
-            //return path + (path == "" ? "" : "/") + filename;
-        }
     }
 }

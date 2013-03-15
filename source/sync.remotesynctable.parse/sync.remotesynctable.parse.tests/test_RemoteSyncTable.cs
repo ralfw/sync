@@ -39,9 +39,42 @@ namespace sync.remotesynctable.parse.tests
 
 
         [Test, Explicit]
+        public void Find_entry()
+        {
+            _sut.AddEntry(new RepoFile  {
+                                            Id = "myid" + DateTime.Now.ToString("s"),
+                                            RelativeFileName = "myfn",
+                                            RepoRoot = "myroot",
+                                            TimeStamp = DateTime.Now,
+                                            User = "myuser"
+                                        });
+
+            Dictionary<string, object> result;
+            Assert.IsTrue(_sut.TryFindEntry(new RepoFile {RelativeFileName = "myfn"}, out result));
+        }
+
+        [Test, Explicit]
+        public void Find_entry_with_subdir_in_relativeFilename()
+        {
+            _sut.AddEntry(new RepoFile
+            {
+                Id = "myid" + DateTime.Now.ToString("s"),
+                RelativeFileName = @"folder\myfn",
+                RepoRoot = "myroot",
+                TimeStamp = DateTime.Now,
+                User = "myuser"
+            });
+
+            Dictionary<string, object> result;
+            Assert.IsTrue(_sut.TryFindEntry(new RepoFile { RelativeFileName = @"folder\myfn" }, out result));
+        }
+
+
+        [Test, Explicit]
         public void Update_entry()
         {
-            var repoFile = new RepoFile{Id="myid" + DateTime.Now.ToString("s"),
+            var oldId = "myid" + DateTime.Now.ToString("s");
+            var repoFile = new RepoFile{Id=oldId,
                                        RelativeFileName = "myfn",
                                        RepoRoot = "myroot",
                                        TimeStamp = DateTime.Now,
@@ -54,7 +87,7 @@ namespace sync.remotesynctable.parse.tests
             RepoFile result = null;
             _sut.UpdateEntry(repoFile, _ => result = _, null); 
   
-            Assert.AreEqual(repoFile.Id, result.Id);
+            Assert.AreEqual(oldId, result.Id);
         }
 
         [Test, Explicit]
