@@ -1,4 +1,5 @@
-﻿using sync.conflicts;
+﻿using System;
+using sync.conflicts;
 using sync.contracts;
 using sync.localfilesystem;
 using sync.localsynctable;
@@ -26,6 +27,8 @@ namespace sync.pull
 
         public void Pull()
         {
+            Console.WriteLine("Pulling from repository {0}...", _remoteRepoPath);
+
             AddOrUpdate();
             Delete();
         }

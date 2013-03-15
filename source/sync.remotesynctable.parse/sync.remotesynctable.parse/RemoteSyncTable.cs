@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Script.Serialization;
 using sync.contracts;
 using sync.remotefilestore.parse.api;
@@ -13,7 +14,7 @@ namespace sync.remotesynctable.parse
     {
         private readonly string _repoName;
         private readonly ParseObjects _parseObjects;
-        private JavaScriptSerializer _jss;
+        private readonly JavaScriptSerializer _jss;
 
         public RemoteSyncTable(string repoName, string parseAppId, string parseRestKey)
         {
@@ -81,7 +82,7 @@ namespace sync.remotesynctable.parse
 
         internal bool TryFindEntry(RepoFile repoFile, out Dictionary<string, object> dictRepoFile)
         {
-            var jsonQueryResults = _parseObjects.Query(_repoName, "{\"relativeFilename\":\"" + RepoFileSerializer.Encode_RelativeFilename(repoFile.RelativeFileName) + "\"}");
+            var jsonQueryResults = _parseObjects.Query(_repoName, "{\"relativeFilename\":\"" + HttpUtility.UrlEncode(repoFile.RelativeFileName) + "\"}");
 
             var queryResults = (Dictionary<string,object>)_jss.DeserializeObject(jsonQueryResults);
             var queryResultItems = (object[])queryResults["results"];

@@ -143,7 +143,7 @@ namespace sync.remotesynctable.parse.tests
         }
 
         [Test, Explicit]
-        public void Test()
+        public void Collect_repo_files()
         {
             _sut.AddEntry(new RepoFile  {
                                             Id = "myid" + DateTime.Now.ToString("s"),
@@ -184,6 +184,25 @@ namespace sync.remotesynctable.parse.tests
             _sut.FilterExistingFiles(new RepoFile { RelativeFileName = "my nonexisting fn" }, _ => result = _);
 
             Assert.AreEqual("my nonexisting fn", result.RelativeFileName);
+        }
+
+
+        [Test]
+        public void Test()
+        {
+            var ms = new MemoryStream();
+            var sw = new StreamWriter(ms);
+                sw.Write(@"A\tB");
+            sw.Flush();
+
+
+            ms.Seek(0, SeekOrigin.Begin);
+
+            using (var sr = new StreamReader(ms))
+            {
+                var t = sr.ReadLine();
+                Console.WriteLine(t);
+            }
         }
     }
 }

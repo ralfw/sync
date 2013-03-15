@@ -1,4 +1,5 @@
-﻿using sync.contracts;
+﻿using System;
+using sync.contracts;
 using sync.ignore;
 using sync.localfilesystem;
 using sync.localsynctable;
@@ -26,6 +27,8 @@ namespace sync.push
 
         public void Push()
         {
+            Console.WriteLine("Pushing to repository {0}...", _pathToRemoteFileStore);
+
             AddOrUpdate();
             Delete();
         }

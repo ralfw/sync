@@ -1,17 +1,12 @@
-löschkonflikte erkennen
-	1. lokal gelöscht, im remote repo verändert:
-		datei in local sync tab, aber nicht in local file sys - aber sie unterscheidet sich von der version in remote sync tab.
-		aktion: herunterladen; die lokale löschung geht verloren. sollte aber im log hervorgehoben werden.
-	2. lokal verändert, im remote repo gelöscht:
-		datei in local sync tab und geändert auch im local file sys - aber sie ist nicht im remote sync tab.
-		aktion: aus local sync tab löschen und lokale datei umbenennen nach *.syncdeleted. sollte im log hervorgehoben werden.
+referenz auf files in remotesynctable.parse eintragen
+	dann können übriggebliebene files durch parse.com GC gelöscht werden
+	dazu muss aber die id-struktur auch der synctable bekannt gemacht werden :-(
+
 
 stefan: konflikte loggen (in rot)
 	logging von konflikten in flows einhängen
 	konflikt-logging farblich hervorheben
 	
-ralf: remote repo in der cloud
-	remotesynctable und remotefilestore auf parse.com umstellen
 
 concurrent access
 	remote repo sperren oder nur einzelne dateien?
@@ -27,3 +22,14 @@ statistik anzeigen
 
 ---done---
 konflikt erkennen: lokal neue datei, aber auch im remote repo diese datei vorhanden
+
+löschkonflikte erkennen
+	1. lokal gelöscht, im remote repo verändert:
+		datei in local sync tab, aber nicht in local file sys - aber sie unterscheidet sich von der version in remote sync tab.
+		aktion: herunterladen; die lokale löschung geht verloren. sollte aber im log hervorgehoben werden.
+	2. lokal verändert, im remote repo gelöscht:
+		datei in local sync tab und geändert auch im local file sys - aber sie ist nicht im remote sync tab.
+		aktion: aus local sync tab löschen und lokale datei umbenennen nach *.syncdeleted. sollte im log hervorgehoben werden.
+
+ralf: remote repo in der cloud
+	remotesynctable und remotefilestore auf parse.com umstellen
