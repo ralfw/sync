@@ -8,6 +8,7 @@ Task Build {
    Exec { msbuild "..\source\sync.remotesynctable.filesystem\sync.remotesynctable.filesystem.sln" }
 
    Exec { msbuild "..\source\sync.remotefilestore.parse\sync.remotefilestore.parse.sln" }
+   Exec { msbuild "..\source\sync.remotesynctable.parse\sync.remotesynctable.parse.sln" }
       
    Exec { msbuild "..\source\sync.ignore\sync.ignore.sln" }
    Exec { msbuild "..\source\sync.conflicts\sync.conflicts.sln" }
