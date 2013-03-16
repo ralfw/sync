@@ -32,7 +32,6 @@ namespace sync.push
             if (_remoteRepoPath.IndexOf(":") > 0 || _remoteRepoPath.IndexOf("..") > 0)
                 return new remotefilestore.filesystem.RemoteFileStore(_remoteRepoPath);
             
-            Console.WriteLine("Storing files in the cloud...");
             return new remotefilestore.parse.RemoteFileStore(_appId, _restKey, _masterKey);
         }
 
@@ -42,7 +41,6 @@ namespace sync.push
             if (_remoteRepoPath.IndexOf(":") > 0 || _remoteRepoPath.IndexOf("..") > 0)
                 return new remotesynctable.filesystem.RemoteSyncTable(_remoteRepoPath);
 
-            Console.WriteLine("Storing sync table in the cloud...");
             return new remotesynctable.parse.RemoteSyncTable(_remoteRepoPath, _appId, _restKey);
         }
     }

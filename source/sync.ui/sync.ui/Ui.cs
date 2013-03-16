@@ -9,6 +9,14 @@ namespace sync.ui
             Console.Write("{0}...", repoFile.RelativeFileName);
         }
 
+        public void LogConflict(RepoFile repoFile)
+        {
+            var fgc = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(" *** Conflict detected! *** ");
+            Console.ForegroundColor = fgc;
+        }
+
         public void LogEndOfOperation(RepoFile repoFile) {
             Console.WriteLine("done.");
         }
