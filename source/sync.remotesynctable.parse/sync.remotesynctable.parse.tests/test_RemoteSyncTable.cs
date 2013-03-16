@@ -39,43 +39,11 @@ namespace sync.remotesynctable.parse.tests
 
 
         [Test, Explicit]
-        public void Find_entry()
-        {
-            _sut.AddEntry(new RepoFile  {
-                                            Id = "myid" + DateTime.Now.ToString("s"),
-                                            RelativeFileName = "myfn",
-                                            RepoRoot = "myroot",
-                                            TimeStamp = DateTime.Now,
-                                            User = "myuser"
-                                        });
-
-            Dictionary<string, object> result;
-            Assert.IsTrue(_sut.TryFindEntry(new RepoFile {RelativeFileName = "myfn"}, out result));
-        }
-
-        [Test, Explicit]
-        public void Find_entry_with_subdir_in_relativeFilename()
-        {
-            _sut.AddEntry(new RepoFile
-            {
-                Id = "myid" + DateTime.Now.ToString("s"),
-                RelativeFileName = @"folder\myfn",
-                RepoRoot = "myroot",
-                TimeStamp = DateTime.Now,
-                User = "myuser"
-            });
-
-            Dictionary<string, object> result;
-            Assert.IsTrue(_sut.TryFindEntry(new RepoFile { RelativeFileName = @"folder\myfn" }, out result));
-        }
-
-
-        [Test, Explicit]
         public void Update_entry()
         {
             var oldId = "myid" + DateTime.Now.ToString("s");
             var repoFile = new RepoFile{Id=oldId,
-                                       RelativeFileName = "myfn",
+                                       RelativeFileName = "folder\\myfn",
                                        RepoRoot = "myroot",
                                        TimeStamp = DateTime.Now,
                                        User="myuser"};
@@ -160,7 +128,7 @@ namespace sync.remotesynctable.parse.tests
             Assert.IsTrue(results.Count > 0);
         }
 
-        [Test]
+        [Test, Explicit]
         public void Filter_existing_file()
         {
             _sut.AddEntry(new RepoFile  {
@@ -177,7 +145,7 @@ namespace sync.remotesynctable.parse.tests
             Assert.IsNull(result);
         }
 
-        [Test]
+        [Test, Explicit]
         public void Pass_on_nonexisting_file()
         {
             RepoFile result = null;
@@ -187,22 +155,36 @@ namespace sync.remotesynctable.parse.tests
         }
 
 
-        [Test]
-        public void Test()
+        [Test, Explicit]
+        public void Create_lock_in_ctor()
         {
-            var ms = new MemoryStream();
-            var sw = new StreamWriter(ms);
-                sw.Write(@"A\tB");
-            sw.Flush();
+        }
 
 
-            ms.Seek(0, SeekOrigin.Begin);
+        [Test, Explicit]
+        public void Lock()
+        {
+            var result = false;
 
-            using (var sr = new StreamReader(ms))
-            {
-                var t = sr.ReadLine();
-                Console.WriteLine(t);
-            }
+            _sut.Lock(() => result = true, null);
+            Assert.IsTrue(result);
+
+            _sut.Lock(() => result = true, null);
+            Assert.IsTrue(result);
+        }
+
+        [Test, Explicit]
+        public void Fail_to_lock_while_locked()
+        {
+            var result = true;
+
+            _sut.Lock(
+                () => _sut.Lock(
+                            null, 
+                            () => result = false), 
+                null);
+
+            Assert.IsFalse(result);
         }
     }
 }

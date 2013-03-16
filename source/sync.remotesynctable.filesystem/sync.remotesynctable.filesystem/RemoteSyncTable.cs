@@ -68,5 +68,18 @@ namespace sync.remotesynctable.filesystem
         {
             _syncTable.ForEach(entry => continueWith(entry.ToRepoFile()));
         }
+
+
+
+        public void Lock(Action onLocked, Action onUnableToLock)
+        {
+            Console.WriteLine("Lock");
+            onLocked();
+        }
+
+        public void FreeLock()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

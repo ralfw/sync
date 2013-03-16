@@ -29,8 +29,12 @@ namespace sync.push
         {
             Console.WriteLine("Pushing to repository {0}...", _pathToRemoteFileStore);
 
-            AddOrUpdate();
-            Delete();
+            _remoteSyncTable.Lock(() => 
+                    {
+                        AddOrUpdate();
+                        Delete();
+                    },
+                    () => Console.WriteLine("*** Aborting push! Could not lock remote repository."));
         }
 
 

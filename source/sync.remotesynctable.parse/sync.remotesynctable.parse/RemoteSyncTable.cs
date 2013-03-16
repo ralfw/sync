@@ -22,6 +22,8 @@ namespace sync.remotesynctable.parse
             _parseObjects = new ParseObjects(parseAppId, parseRestKey);
 
             _jss = new JavaScriptSerializer();
+
+            Create_lock();
         }
 
 
@@ -35,7 +37,7 @@ namespace sync.remotesynctable.parse
         public void UpdateEntry(RepoFile repoFile, Action<RepoFile> onEntryUpdated, Action<RepoFile> onNoEntry)
         {
             Dictionary<string, object> item;
-            if (TryFindEntry(repoFile, out item))
+            if (_parseObjects.TryFindByFieldvalue(_repoName, "relativeFilename", HttpUtility.UrlEncode(repoFile.RelativeFileName), out item))
             {
                 _parseObjects[_repoName, item["objectId"].ToString()] = repoFile.ToJson();
 
@@ -49,7 +51,7 @@ namespace sync.remotesynctable.parse
         public RepoFile DeleteEntry(RepoFile repoFile)
         {
             Dictionary<string, object> item;
-            if (TryFindEntry(repoFile, out item))
+            if (_parseObjects.TryFindByFieldvalue(_repoName, "relativeFilename", HttpUtility.UrlEncode(repoFile.RelativeFileName), out item))
             {
                 _parseObjects.Delete(_repoName, item["objectId"].ToString());   
             }
@@ -75,24 +77,47 @@ namespace sync.remotesynctable.parse
         public void FilterExistingFiles(RepoFile repoFile, Action<RepoFile> onNonExistingFile)
         {
             Dictionary<string, object> _;
-            if (!TryFindEntry(repoFile, out _))
+            if (!_parseObjects.TryFindByFieldvalue(_repoName, "relativeFilename", HttpUtility.UrlEncode(repoFile.RelativeFileName), out _))
                 onNonExistingFile(repoFile);
         }
 
 
-        internal bool TryFindEntry(RepoFile repoFile, out Dictionary<string, object> dictRepoFile)
+        public void Lock(Action onLocked, Action onUnableToLock)
         {
-            var jsonQueryResults = _parseObjects.Query(_repoName, "{\"relativeFilename\":\"" + HttpUtility.UrlEncode(repoFile.RelativeFileName) + "\"}");
+            Dictionary<string, object> lockObject;
+            _parseObjects.TryFindByFieldvalue("synclocks", "name", _repoName, out lockObject);
+            _parseObjects.Inc("synclocks", lockObject["objectId"].ToString(), "flag", 1);
 
-            var queryResults = (Dictionary<string,object>)_jss.DeserializeObject(jsonQueryResults);
-            var queryResultItems = (object[])queryResults["results"];
-
-            if (queryResultItems.Length > 0)
-                dictRepoFile = (Dictionary<string, object>) queryResultItems[0];
+            var jsonLockObject = _parseObjects["synclocks", lockObject["objectId"].ToString()];
+            lockObject = (Dictionary<string,object>)_jss.DeserializeObject(jsonLockObject);
+            if ((int)lockObject["flag"] == 1)
+            {
+                try
+                {
+                    onLocked();
+                }
+                finally
+                {
+                    _parseObjects.Inc("synclocks", lockObject["objectId"].ToString(), "flag", -1);
+                }
+            }
             else
-                dictRepoFile = null;
+            {
+                _parseObjects.Inc("synclocks", lockObject["objectId"].ToString(), "flag", -1);
+                onUnableToLock();
+            }
+        }
 
-            return dictRepoFile != null;
+        public void FreeLock()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Create_lock()
+        {
+            Dictionary<string, object> _;
+            if (!_parseObjects.TryFindByFieldvalue("synclocks", "name", _repoName, out _))
+                _parseObjects.New("synclocks", "{\"name\":\"" + _repoName + "\", \"flag\":0}");
         }
     }
 }

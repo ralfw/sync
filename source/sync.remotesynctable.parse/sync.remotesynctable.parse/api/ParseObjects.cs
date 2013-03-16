@@ -17,20 +17,22 @@ namespace sync.remotefilestore.parse.api
         private readonly string _appId;
         private readonly string _restKey;
 
+        private readonly JavaScriptSerializer _jss;
+
 
         public ParseObjects(string appId, string restKey)
         {
             _appId = appId;
             _restKey = restKey;
+
+            _jss = new JavaScriptSerializer();
         }
 
 
         public string New(string classname, string jsondata)
         {
             var jsonresponse = Request("POST", BASE_URL + classname, jsondata);
-
-            var jss = new JavaScriptSerializer();
-            var dict = jss.Deserialize<Dictionary<string, string>>(jsonresponse);
+            var dict = _jss.Deserialize<Dictionary<string, string>>(jsonresponse);
             return dict["objectId"];
         }
 
@@ -55,16 +57,41 @@ namespace sync.remotefilestore.parse.api
         }
 
 
+        public bool TryFindByFieldvalue(string classname, string fieldname, string value, out Dictionary<string, object> dictRepoFile)
+        {
+            var jsonQueryResults = this.Query(classname, "{\"" + fieldname + "\":\"" + value + "\"}");
+
+            var queryResults = (Dictionary<string, object>)_jss.DeserializeObject(jsonQueryResults);
+            var queryResultItems = (object[])queryResults["results"];
+
+            if (queryResultItems.Length > 0)
+                dictRepoFile = (Dictionary<string, object>)queryResultItems[0];
+            else
+                dictRepoFile = null;
+
+            return dictRepoFile != null;
+        }
+
+
         public string Query(string classname)
         {
-            return Request("GET", BASE_URL + "/" + classname, null);
+            return Request("GET", BASE_URL + classname, null);
         }
+
 
         public string Query(string classname, string where)
         {
-            return Request("GET", BASE_URL + "/" + classname + "?where=" + HttpUtility.UrlEncode(where), null);
+            return Request("GET", BASE_URL + classname + "?where=" + HttpUtility.UrlEncode(where), null);
         }
 
+
+        public void Inc(string classname, string objectId, string fieldname, int amount)
+        {
+            var data = string.Format("{{\"{0}\":{{\"__op\":\"Increment\", \"amount\":{1}}}}}", fieldname, amount);
+            Request("PUT", 
+                    BASE_URL + classname + "/" + objectId, 
+                    data);
+        }
 
 
         string Request(string method, string url, string data)

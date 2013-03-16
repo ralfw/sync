@@ -13,5 +13,8 @@ namespace sync.contracts
         RepoFile DeleteEntry(RepoFile repoFile);
 
         void FilterExistingFiles(RepoFile repoFile, Action<RepoFile> onNonExistingFile);
+
+        void Lock(Action onLocked, Action onUnableToLock);
+        void FreeLock();
     }
 }

@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="test_ParseObjects.cs" />
     <Compile Include="test_RemoteSyncTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
